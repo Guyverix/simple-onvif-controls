@@ -62,6 +62,10 @@ for i in ${needed} ; do
 done
 }
 
+function capabilitiesTemplate() {
+DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"> <s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <GetCapabilities xmlns=\"http://www.onvif.org/ver10/device/wsdl\"> <Category>All</Category> </GetCapabilities> </s:Body> </s:Envelope>"
+}
+
 function profileTemplate() {
 DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"> <s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <GetProfiles xmlns=\"http://www.onvif.org/ver10/media/wsdl\"/> </s:Body> </s:Envelope>"
 }
@@ -82,6 +86,11 @@ function setHoro() {
 function setVirt() {
   echo "Missing Up Down move parameters.  Setting defaults"
   echo "VIRT='0.1'" >> ./settings.cfg
+}
+
+function findCapabilities() {
+  capabilitiesTemplate
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/media_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/GetCapabilities"  --data "$(echo ${DIR})" > ./responses/findCapabilities.xml
 }
 
 function findProfile() {
@@ -152,6 +161,11 @@ if [[ -z ${VIRT} ]]; then
   setVirt
 else
   echo "Up Down movement set at ${VIRT} steps"
+fi
+
+if [[ ! -e ./responses/findCapabilities.xml ]]; then
+  findCapabilities
+  echo "Grabbing the camera capabilities if possible"
 fi
 
 # Reinclude our settings with anything that we have set

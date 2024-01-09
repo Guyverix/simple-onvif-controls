@@ -41,3 +41,6 @@ it to their camera or use case.
 to add to this script.  
 - This is not intended to be a full blown "application" but simply
 a solution to more easily control these poorly documented ONVIF cameras.
+- To find more goodies to add, parse your XML output in the responses directory and make the XML function
+to use the goodie you found.
+- cat ./responses/???.xml | xml2 will show the XML in a readable way
