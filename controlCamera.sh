@@ -34,6 +34,9 @@ it and skip that discovery attempt.
 The horizontal and vertical values are default values of 0.1, however if the camera
 does not respond to that small of a value, attempt 0.5 for each.
 
+When in doubt, cat your response xml and pipe it through xml2 looking for clues
+to what your camera was expecting
+
 Options:
   usage | -h  show this help screen
   left        move left
@@ -119,7 +122,7 @@ function moveDown() {
 verifyDeps
 
 # Where we store our XML responses
-if [[ ! -e ./responses ]];
+if [[ ! -e ./responses ]]; then
   mkdir responses
 fi
 
