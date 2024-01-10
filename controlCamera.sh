@@ -62,6 +62,22 @@ for i in ${needed} ; do
 done
 }
 
+function zoomInTemplate() {
+DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><ContinuousMove xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><Velocity><Zoom x=\"${Z_IN}\" xmlns=\"http://www.onvif.org/ver10/schema\"/></Velocity></ContinuousMove></s:Body></s:Envelope>"
+}
+
+function zoomOutTemplate() {
+DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><ContinuousMove xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><Velocity><Zoom x=\"${Z_OUT}\" xmlns=\"http://www.onvif.org/ver10/schema\"/></Velocity></ContinuousMove></s:Body></s:Envelope>"
+}
+
+function stopTemplate() {
+#DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
+#DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
+DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
+#DIR="<s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Stop xmlns="http://www.onvif.org/ver20/ptz/wsdl"><ProfileToken>' . $profileToken . '</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>
+
+}
+
 function capabilitiesTemplate() {
 DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"> <s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <GetCapabilities xmlns=\"http://www.onvif.org/ver10/device/wsdl\"> <Category>All</Category> </GetCapabilities> </s:Body> </s:Envelope>"
 }
@@ -77,6 +93,8 @@ DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Body xml
 function vertTempate() {
 DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"> <s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"> <ContinuousMove xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"> <ProfileToken>${CONTROL}</ProfileToken> <Velocity> <PanTilt xmlns=\"http://www.onvif.org/ver10/schema\" x=\"0\" y=\"${DIRECTION}${VIRT}\"/></Velocity></ContinuousMove></s:Body></s:Envelope>"
 }
+########### End of templatized XML
+
 
 function setHoro() {
   echo "Missing Left Right move parameters.  Setting defaults"
@@ -101,31 +119,48 @@ function findProfile() {
   CONT_SINGLE=$(echo -e "${CONTROL}" | head -1)
   echo -e "CONTROL=${CONT_SINGLE}" >> ./settings.cfg
 }
+############## end of finding information
+
+
 
 function moveLeft() {
   DIRECTION='-'
   horoTemplate
-  curl -s -X POST "http://${HOST}:${PORT}/onvif/media_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveLeft.xml
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/device_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveLeft.xml
 }
 
 function moveRight() {
   DIRECTION=''
   horoTemplate
-  curl -s -X POST "http://${HOST}:${PORT}/onvif/media_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveRight.xml
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/device_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveRight.xml
 }
 
 function moveUp() {
   DIRECTION=''
   vertTempate
-  curl -s -X POST "http://${HOST}:${PORT}/onvif/media_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveUp.xml
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/device_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveUp.xml
 }
 
 function moveDown() {
   DIRECTION='-'
   vertTempate
-  curl -s -X POST "http://${HOST}:${PORT}/onvif/media_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveDown.xml
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/device_service" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver10/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/moveDown.xml
 }
 
+function stopMove() {
+  stopTemplate
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/PTZ" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver20/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/stopMove.xml
+}
+
+function zoomIn() {
+  zoomInTemplate
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/PTZ" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver20/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/zoomIn.xml
+}
+
+function zoomOut() {
+  zoomOutTemplate
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/PTZ" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver20/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/zoomOut.xml
+}
 
 # Make sure we have our binaries before attempting work
 verifyDeps
@@ -173,10 +208,13 @@ fi
 
 case ${1} in
   usage|-h) usage; exit 0 ;;
-  l*) moveLeft ;;
-  r*) moveRight ;;
-  u*) moveUp ;;
-  d*) moveDown ;;
+  l*) moveLeft ; sleep ${PAUSE} ; stopMove ;;
+  r*) moveRight; sleep ${PAUSE} ; stopMove ;;
+  u*) moveUp ; sleep ${PAUSE} ; stopMove ;;
+  d*) moveDown ; sleep ${PAUSE} ; stopMove ;;
+  s*)  stopMove ;;
+  zoomIn) zoomIn;;
+  zoomOut) zoomOut;;
   *) echo "Missing valid command to do" ;;
 esac
 
