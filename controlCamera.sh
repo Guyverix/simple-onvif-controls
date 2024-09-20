@@ -73,8 +73,12 @@ DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\
 function stopTemplate() {
 #DIR="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
 #DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
-DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
 #DIR="<s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><Stop xmlns="http://www.onvif.org/ver20/ptz/wsdl"><ProfileToken>' . $profileToken . '</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>
+
+DIR="<s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Stop xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><PanTilt>true</PanTilt><Zoom>false</Zoom></Stop></s:Body></s:Envelope>"
+
+DIR2="<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\"><s:Body xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><ContinuousMove xmlns=\"http://www.onvif.org/ver20/ptz/wsdl\"><ProfileToken>${CONTROL}</ProfileToken><Velocity><PanTilt xmlns=\"http://www.onvif.org/ver10/schema\" x=\"0\" y=\"0\"/></Velocity></ContinuousMove></s:Body></s:Envelope>"
+
 
 }
 
@@ -150,6 +154,7 @@ function moveDown() {
 function stopMove() {
   stopTemplate
   curl -s -X POST "http://${HOST}:${PORT}/onvif/PTZ" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver20/media/wsdl/ContinuousMove"  --data "$(echo ${DIR})" > ./responses/stopMove.xml
+  curl -s -X POST "http://${HOST}:${PORT}/onvif/PTZ" -u ${USER}:${PASS} -H "Content-Type: application/soap+xml; charset=utf-8" -H "SOAPAction: http://www.onvif.org/ver20/media/wsdl/ContinuousMove"  --data "$(echo ${DIR2})" > ./responses/stopMove2.xml
 }
 
 function zoomIn() {
